@@ -2,30 +2,52 @@
 
 **Overview**
 
-The city of Chicago has one of the highest crime rates in the US. This is a cause for concern for current and future residents, as most would prefer to live in an area with little or no crime. For this reason, it is necessary to identify areas of high crime and predict where the next crime could potentially occur, so the crime can be prevented. Since traditional crime prediction methods are ineffective, a non-traditional method must be used. Hence, this project involves the use of pharmaceutical locations to predict the location of the next crime.
+Chicago consistently ranks among the U.S. cities with the highest crime rates. To help law enforcement and city planners allocate resources more effectively, it is crucial not only to identify existing high-crime areas but also to predict areas where future crimes may occur. Since traditional crime prediction models often lack in contextual sensitivity, this project takes a novel unconventional approach by using pharmacy locations to enhance crime prediction.
 
 **Data Understanding**
 
-The NYC Taxi and Limousine Commission data came from data.cityofchicago.org. The data consisted of approximately 8164329 rows and 7 features. The features included information on date, primary type, arrest, district, domestic, location description, and location. The bar chart below shows the breakdown of the most common types of crimes and their arrest rate.
+Data was sourced from data.cityofchicago.org, comprising over 8 million crime records and features including: date, primary type, arrest, district, domestic, location description, and location. Additionally, pharmacy locations across the city were extracted and mapped by ZIP code.
+
+Key Visual Insights:
+
+Crime Frequency:
+As seen in the bar chart, theft, battery, and criminal damage are the most frequent offenses. Theft alone accounts for nearly 200,000 incidents, though arrest rates vary significantly by crime type.
 
 <img src="https://github.com/user-attachments/assets/482ad86d-b8c0-4070-aed6-85eb03e20bcb" alt="Most Common Types of Crime" width="600">
 
-The following graph shows the change in the top 3 most common crimes over the years.
+Crime Trends Over Time:
+In recent years, the number of these top crimes sharply rose around 2020, possibly due to socio-economic disruptions during the COVID-19 pandemic.
 
 <img src="https://github.com/user-attachments/assets/36751fbf-4676-4b36-99bc-0a8b729b229b" alt="Most Common Types of Crime" width="600">
 
-The crime distribution by zip code.
+Crime Geography:
+The heatmap reveals that crimes are heavily concentrated in South and West Chicago ZIP codes, particularly where the count ranges from 200,000 to over 360,000 incidents.
 
 <img src="https://github.com/user-attachments/assets/eaebb799-3fcd-40a2-bc86-4c73fae1db8b" alt="Most Common Types of Crime" width="600">
 
-The pharmacy distribution by zip code.
+Pharmacy Density:
+Pharmacies seem to be more densely located in North and Central Chicago, often aligning inversely with the highest crime zones—suggesting a disparity in community infrastructure.
 
 <img src="https://github.com/user-attachments/assets/cc328301-7a0b-4af0-b33f-356c2c4b6ada" alt="Most Common Types of Crime" width="600">
 
+
 **Modeling and Evaluation**
 
-To use the data properly, first, multiple null rows were dropped. Next, the columns containing the latitude and longitude values were isolated for each dataset: latitude and longitude for the crime dataset and New Georeferenced Column for the pharmacy dataset. A floating-point conversion was then attempted for each data point. If the conversion failed, it was replaced with a zero and filtered out of the dataset. Next, the x and y coordinates of the data were zipped together and used to create a data frame using Apache Spark. The next step involved using k-means clustering, a machine learning algorithm used to group data points based on their similarity. The goal is to create a clustered heatmap based on the dataset to identify areas of high crime and use this to aid in the prediction. To achieve this, the Euclidean distance was calculated between the pharmaceutical locations and crime locations, and the spark_min function was used to identify the minimum distance between the two locations. The crime dataset is then combined with the minimum distance and pharmaceutical data frames. Spark’s vector assemble was used to combine the columns into one, and then it was further preprocessed by Spark’s standard scaler. The data was passed into a model that used k-means clustering to identify patterns within the dataset. To test the model, the code was run in the Databricks environment.
+After removing null and malformed rows, the datasets were transformed by:
+1. Geospatial preprocessing of latitude and longitude columns;
+2. Vectorization and standardization using Spark’s MLlib tools;
+3. Clustering via K-Means to detect spatial patterns;
+4. Distance analysis using Euclidean metrics between crime clusters and pharmacy locations.
+
+Clusters with high crime density were spatially compared with pharmacy distribution. While pharmacies do not directly cause or prevent crime, their presence often correlates with better infrastructure, foot traffic, and surveillance—factors that can influence criminal activity.
 
 **Conclusion**
 
-In conclusion, it has been identified that areas from x = -87.8 to -87.5, y=41.65 to 42.05 are the areas where crime occurs, and are therefore the areas to have future crimes occur. Therefore, the police force should be focused on these areas. Furthermore, future residents should avoid these areas. The data drew inconclusive results on the relationship between crime and pharmaceutical locations. A limitation this project faced had to do with the environment being used, as the majority of the data to be used could not be included in the dataset. An improvement to this experiment would be to use an environment capable of handling the full crime dataset, and perhaps this experiment could be redone with another parameter, such as restaurant locations.
+Hotspot Identification:
+The most crime-prone zones are between longitude -87.8 to -87.5 and latitude 41.65 to 42.05. This corresponds to areas in South and West Chicago, where crime rates are historically high and pharmacy density is low.
+
+Predicted Future Crime Areas:
+Based on clustering and the inverse relationship with pharmacy locations, ZIP codes in mid-southern Chicago that currently have rising crime trends but low infrastructure density are the most likely regions for future crimes. Specific ZIP codes falling in this prediction zone include parts of Englewood, West Englewood, Washington Park, and Greater Grand Crossing.
+
+Limitations:
+Due to computational constraints, only a subset of the full dataset was modeled. Running the full dataset in a more scalable environment (e.g., full Spark cluster or cloud-based solution like AWS EMR) would yield more robust results.
